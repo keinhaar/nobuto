@@ -118,6 +118,7 @@ public class Repository
         Element update = W3CDomUtils.addElement(unit.getElement(), "update");
         update.setAttribute("id", id);
         update.setAttribute("range", "[0.0.0," + version + ")");
+        update.setAttribute("severity", "0"); //just to avoid warning message in errorlog.
         
         Element artifacts = W3CDomUtils.addElement(unit.getElement(), "artifacts");
         Element artifact = W3CDomUtils.addElement(artifacts, "artifact");

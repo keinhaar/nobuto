@@ -213,6 +213,43 @@ public class JavaBuilder extends Builder
         writer.close();
     }
 
+    /**
+     * Run any other JAVA command.
+     * @throws Exception 
+     */
+    public void runJava(String classname, String ... parameters) throws Exception
+    {
+        writeJavaOptions(classname, parameters);
+        int ret = runCommand("java"
+            , "@.javaoptions"
+            );
+        if(ret != 0)
+        {
+            throw new RuntimeException("Running JAVA command failed");
+        }
+    }
+    
+    /**
+     * Writes the required java parameters for subcommands
+     * @param classname Name of the class containing a main method.
+     * @throws Exception
+     */
+    protected void writeJavaOptions(String classname, String ... parameters ) throws Exception
+    {
+        String cpath = buildPath(classpath);
+        String path = cpath;
+        File file = new File(".javaoptions");
+//        file.deleteOnExit();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+        writer.write("-cp " + path + "\r\n");
+        writer.write(classname + "\r\n");
+        for(int i=0;i<parameters.length;i++)
+        {
+            writer.write(parameters[i] + "\r\n");
+        }
+        writer.close();
+    }
+
     public String getOutputFolder()
     {
         return outputFolder;
@@ -364,6 +401,7 @@ public class JavaBuilder extends Builder
                 String filename = files[i].toString().substring(cut);
                 filename = filename.replace("\\", "/");
                 JarEntry ze = new JarEntry(filename);
+                verbosePrint(3, "Added to jar: " + filename);
                 jout.putNextEntry(ze);
                 jout.write(data);
                 jout.closeEntry();

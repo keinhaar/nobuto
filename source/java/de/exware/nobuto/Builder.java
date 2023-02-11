@@ -35,6 +35,10 @@ abstract public class Builder
             try
             {
                 lines = Files.readAllLines(versionFile.toPath());
+                if(lines.size() == 0)
+                {
+                    throw new IllegalStateException("version.txt is empty.");
+                }
                 version = lines.get(0).trim();
             }
             catch (IOException e)
@@ -60,9 +64,9 @@ abstract public class Builder
      */
     public void dist() throws Exception
     {
-        verbosePrint(1, "DIST");
         checkTools();
         compile();
+        verbosePrint(1, "DIST");
     }
 
     /**

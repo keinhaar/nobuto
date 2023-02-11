@@ -24,4 +24,9 @@ public class Dependency
     {
         return version;
     }
+    
+    protected void setVersion(String version)
+    {
+        this.version = version;
+    }
 }

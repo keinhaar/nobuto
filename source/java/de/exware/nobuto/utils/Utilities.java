@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.JOptionPane;
 
@@ -184,6 +186,7 @@ public class Utilities
             in.close();
             out.close();
             file2.setLastModified(file1.lastModified());
+            verbosePrint(3, "Copied: " + file1 + " --> " + file2);
         }
     }
 
@@ -262,6 +265,7 @@ public class Utilities
             if(file.list().length == 0)
             {
                 file.delete();
+                verbosePrint(3, "Deleted: " + file.getAbsolutePath());
             }
         }
         else
@@ -269,6 +273,7 @@ public class Utilities
             if(filter == null || filter.accept(file))
             {
                 file.delete();
+                verbosePrint(3, "Deleted: " + file.getAbsolutePath());
             }
         }
     }
@@ -402,23 +407,30 @@ public class Utilities
     {
         Charset cset = Charset.forName(charset); 
         Path path = Paths.get(file);
-        if(Files.size(path) > 1000000)
+        if(Files.exists(path))
         {
-            throw new IOException("File to large");
-        }
-        byte[] data = Files.readAllBytes(path);
-        String str = new String(data, cset);
-        String newStr = str.replaceAll(pattern, replacement);
-        if(str.equals(newStr))
-        {
-            verbosePrint(1, "Nothing to replace in " + path.toAbsolutePath() + ": " + pattern + " -> " + replacement);
+            if(Files.size(path) > 1000000)
+            {
+                throw new IOException("File to large");
+            }
+            byte[] data = Files.readAllBytes(path);
+            String str = new String(data, cset);
+            String newStr = str.replaceAll(pattern, replacement);
+            if(str.equals(newStr))
+            {
+                verbosePrint(1, "Nothing to replace in " + path.toAbsolutePath() + ": " + pattern + " -> " + replacement);
+            }
+            else
+            {
+                verbosePrint(1, "Replacing in " + path.toAbsolutePath() + ": " + pattern + " -> " + replacement);
+                BufferedWriter writer = Files.newBufferedWriter(path, cset);
+                writer.write(newStr);
+                writer.close();
+            }
         }
         else
         {
-            verbosePrint(1, "Replacing in " + path.toAbsolutePath() + ": " + pattern + " -> " + replacement);
-            BufferedWriter writer = Files.newBufferedWriter(path, cset);
-            writer.write(newStr);
-            writer.close();
+            verbosePrint(0, "Nothing replaced, because file does not exist: " + file);
         }
     }
     
@@ -511,4 +523,121 @@ public class Utilities
         }
         return ret;
     }
+    
+    public static final void echo(String text)
+    {
+        System.out.println(text);
+    }
+    
+    public static final void echo(String text, String file) throws IOException
+    {
+        echo(text, new File(file), false);
+    }
+    
+    public static final void echo(String text, File file, boolean append) throws IOException
+    {
+        FileOutputStream out = new FileOutputStream(file, append);
+        out.write(text.getBytes("UTF-8"));
+        out.close();
+    }
+
+    /**
+     * Creates a ZIP File.
+     * @param filename the name of the resulting zip.
+     * @param sourceDir the directory that will be in the zip. The directory itself is not included. only the contents
+     * @throws IOException
+     */
+    public static void zip(String filename, String sourceDir) throws IOException
+    {
+        zip(filename, new File(sourceDir));
+    }
+
+    /**
+     * Creates a ZIP File.
+     * @param filename the name of the resulting ZIP.
+     * @param sourceDir the directory that will be in the ZIP. The directory itself is not included. only the contents
+     * @throws IOException
+     */
+    public static void zip(String filename, String sourceDir, FileFilter filter) throws IOException
+    {
+        zip(filename, new File(sourceDir), filter);
+    }
+
+    /**
+     * Creates a ZIP File.
+     * @param filename the name of the resulting ZIP.
+     * @param sourceDir the directory that will be in the ZIP. The directory itself is not included. only the contents
+     * @throws IOException
+     */
+    public static void zip(String filename, File sourceDir) throws IOException
+    {
+        zip(filename, sourceDir, null);
+    }
+    
+    /**
+     * Creates a ZIP File.
+     * @param filename the name of the resulting ZIP.
+     * @param sourceDir the directory that will be in the ZIP. The directory itself is not included. only the contents
+     * @throws IOException
+     */
+    public static void zip(String filename, File sourceDir, FileFilter filter) throws IOException
+    {
+        ZipOutputStream zout;
+        zout = new ZipOutputStream(new FileOutputStream(filename));
+        zip(zout, sourceDir, sourceDir.toString().length() + 1, filter);
+        zout.finish();
+        zout.flush();
+        zout.close();
+    }
+
+    /**
+     * 
+     * @param zout
+     * @param dir
+     * @param cut gives the position, where the pathname in the zip will start.
+     * @throws IOException
+     */
+    private static void zip(ZipOutputStream zout, File dir, int cut, FileFilter filter) throws IOException
+    {
+        File files[] = dir.listFiles();
+        for (int i = 0; i < files.length; i++)
+        {
+            if (files[i].isDirectory())
+            {
+                zip(zout, files[i], cut, filter);
+            }
+            else
+            {
+                if(files[i].getName().equals("nobuto.jar") 
+                    || (filter != null && filter.accept(files[i]) == false))
+                {
+                    continue;
+                }
+                FileInputStream fin = new FileInputStream(files[i]);
+                byte data[] = Utilities.readAll(fin);
+                fin.close();
+                String filename = files[i].toString().substring(cut);
+                filename = filename.replace("\\", "/");
+                ZipEntry ze = new ZipEntry(filename);
+                verbosePrint(3, "Added to zip: " + filename);
+                zout.putNextEntry(ze);
+                zout.write(data);
+                zout.closeEntry();
+            }
+        }
+    }
+
+    public static final void concat(File target, File ... filesToConcat) throws IOException
+    {
+        FileOutputStream fout = new FileOutputStream(target, true);
+        for(int i=0;i<filesToConcat.length;i++)
+        {
+            verbosePrint(2, "Concatenating " + filesToConcat[i] + " to " + target);
+            FileInputStream fin = new FileInputStream(filesToConcat[i]);
+            copy(fin, fout);
+            fin.close();
+        }
+        fout.close();
+    }
+    
 }
