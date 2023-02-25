@@ -33,6 +33,21 @@ public class Unit
         prop.setAttribute("value", value);
     }
     
+    public void addLicense(String uri, String url, String text)
+    {
+        Element licenses = W3CDomUtils.getOrCreate(unit, "licenses");
+        Element license = W3CDomUtils.addElement(licenses, "license");
+        license.setAttribute("uri", uri);
+        license.setAttribute("url", url);
+        license.setTextContent(text);
+    }
+    
+    public void addCopyright(String text)
+    {
+        Element copyright = W3CDomUtils.getOrCreate(unit, "copyright");
+        copyright.setTextContent(text);
+    }
+    
     public void addRequired(String namespace, String name, String range)
     {
         Element properties = W3CDomUtils.getOrCreate(unit, "requires");
