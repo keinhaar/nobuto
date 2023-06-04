@@ -241,4 +241,7 @@ abstract public class Builder
         return dependencies;
     }
     
+    public void clean() throws IOException
+    {
+    }
 }

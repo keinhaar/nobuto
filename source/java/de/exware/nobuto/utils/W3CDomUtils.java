@@ -1,6 +1,8 @@
 package de.exware.nobuto.utils;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +48,21 @@ public class W3CDomUtils
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputStream in = url.openStream();
+        Document doc = builder.parse(in);
+        in.close();
+        return doc;
+    }
+    
+    public static Document read(String file) throws ParserConfigurationException, IOException, SAXException
+    {
+        return read(new File(file));
+    }
+    
+    public static Document read(File file) throws ParserConfigurationException, IOException, SAXException
+    {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
         Document doc = builder.parse(in);
         in.close();
         return doc;

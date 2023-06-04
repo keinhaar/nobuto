@@ -21,6 +21,8 @@ public class MavenDependency extends JavaDependency
     {
         super.addToClasspath(builder);
         Maven maven = Maven.getDefaultinstance();
+        File file = new File("tmp/maven");
+        file.mkdirs();
         File lib = maven.get(groupId, getProjectname(), getVersion(), "tmp/maven");
         if(lib == null)
         {

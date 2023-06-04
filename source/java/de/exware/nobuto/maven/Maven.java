@@ -11,7 +11,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Document;
+
 import de.exware.nobuto.utils.Utilities;
+import de.exware.nobuto.utils.W3CDomUtils;
 
 /**
  * A simple class to download maven artifacts.
@@ -78,6 +81,45 @@ public class Maven
         throw new IOException("No such file, or connection not possible: " + file);
     }
 
+    /**
+     * Installs a jar File to the local maven repo.
+     * @param jarFile
+     * @param groupId
+     * @param artifactId
+     * @param version
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void installJar(File jarFile, String groupId, String artifactId, String version) throws IOException, InterruptedException
+    {
+        groupId = groupId.replace('.', '/');
+        File file = new File(getLocalRepo() + "/" + groupId + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + ".jar");
+        file.getParentFile().mkdirs();
+        Utilities.copy(jarFile, file, true);
+//        int ret = Utilities.runCommand("mvn", "install:install-file", "-Dfile=" + jarFile.getAbsolutePath(), "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=" + version, "-Dpackaging=jar", "-DgeneratePom=false");
+    }
+    
+    /**
+     * Get the path for the local maven repo
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public String getLocalRepo() throws IOException, InterruptedException
+    {
+        String repo = null;
+        try
+        {
+            Document doc = W3CDomUtils.read(System.getProperty("user.home") + "/.m2/settings.xml");
+            repo = W3CDomUtils.selectSingleNode(doc, "/settings/localRepository").getTextContent();
+        }
+        catch (Exception e)
+        {
+            repo = System.getProperty("user.home") + "/.m2";
+        }
+        return repo;
+    }
+    
     public static Maven getDefaultinstance()
     {
         return defaultInstance;
