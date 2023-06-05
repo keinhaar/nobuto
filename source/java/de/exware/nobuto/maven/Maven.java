@@ -100,6 +100,24 @@ public class Maven
     }
     
     /**
+     * Installs a jar File to the local maven repo.
+     * @param jarFile
+     * @param groupId
+     * @param artifactId
+     * @param version
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void installSourceJar(File jarFile, String groupId, String artifactId, String version) throws IOException, InterruptedException
+    {
+        groupId = groupId.replace('.', '/');
+        File file = new File(getLocalRepo() + "/" + groupId + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + "-sources.jar");
+        file.getParentFile().mkdirs();
+        Utilities.copy(jarFile, file, true);
+//        int ret = Utilities.runCommand("mvn", "install:install-file", "-Dfile=" + jarFile.getAbsolutePath(), "-DgroupId=" + groupId, "-DartifactId=" + artifactId, "-Dversion=" + version, "-Dpackaging=jar", "-DgeneratePom=false");
+    }
+    
+    /**
      * Get the path for the local maven repo
      * @return
      * @throws IOException
