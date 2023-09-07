@@ -14,9 +14,11 @@ public class Main
 {
     public static String target;
     public static int verboseLevel = 0;
+    public static String[] args;
     
     public static void main(String[] args) throws Exception
     {
+        Main.args = args;
         System.out.println("JAVA Version: " + System.getProperty("java.version"));
         System.out.println("Operating System: " + System.getProperty("os.name") + " " + System.getProperty("os.version")
             + " " + System.getProperty("os.arch"));
@@ -89,12 +91,19 @@ public class Main
      */
     private static void compileBuild(String buildSourceDir, String clazzname, File clazzfile) throws Exception
     {
-        System.out.println("Compile Builder Class");
-        JavaBuilder bj = new JavaBuilder();
-        bj.setOutputFolder(buildSourceDir + "/classes");
-        bj.addSources(buildSourceDir);
-        bj.addClasspathItem("build/nobuto.jar");
-        bj.compile(clazzfile.getPath());
+        if(System.getProperty("nobuildcompile") != null)
+        {
+            System.out.println("No Build compile");
+        }
+        else
+        {
+            System.out.println("Compile Builder Class");
+            JavaBuilder bj = new JavaBuilder("");
+            bj.setOutputFolder(buildSourceDir + "/classes");
+            bj.addSources(buildSourceDir);
+            bj.addClasspathItem("build/nobuto.jar");
+            bj.compile(clazzfile.getPath());
+        }
     }
 
     /**

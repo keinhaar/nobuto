@@ -534,6 +534,11 @@ public class Utilities
         echo(text, new File(file), false);
     }
     
+    public static final void echo(String text, String file, boolean append) throws IOException
+    {
+        echo(text, new File(file), append);
+    }
+    
     public static final void echo(String text, File file, boolean append) throws IOException
     {
         FileOutputStream out = new FileOutputStream(file, append);

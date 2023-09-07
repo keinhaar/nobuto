@@ -25,9 +25,11 @@ abstract public class Builder
 {
     private List<Dependency> dependencies = new ArrayList<>();
     private String version;
+    private String projectname;
     
-    public Builder()
+    public Builder(String projectname)
     {
+        this.projectname = projectname;
         File versionFile = new File("version.txt");
         if(versionFile.exists())
         {
@@ -243,5 +245,10 @@ abstract public class Builder
     
     public void clean() throws IOException
     {
+    }
+
+    public String getProjectname()
+    {
+        return projectname;
     }
 }

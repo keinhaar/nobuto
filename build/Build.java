@@ -11,6 +11,12 @@ public class Build extends de.exware.nobuto.java.JavaBuilder
     private static final String TMP = "tmp";
     private static final String DISTRIBUTION_DIR = "dist";
     
+    public Build()
+    {
+        super("de.exware.nobuto");
+    }
+    
+    @Override
     public void clean() throws IOException
     {
         verbosePrint(1, "Cleaning up");

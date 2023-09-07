@@ -20,10 +20,19 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
 import de.exware.nobuto.Builder;
 import de.exware.nobuto.Dependency;
 import de.exware.nobuto.Main;
 import de.exware.nobuto.utils.Utilities;
+import de.exware.nobuto.utils.W3CDomUtils;
 
 /**
  * Default Java Builder.
@@ -38,8 +47,9 @@ public class JavaBuilder extends Builder
     private String targetVersion = "8";
     private String sourceVersion = "8";
     
-    public JavaBuilder() 
+    public JavaBuilder(String projectname) 
     {
+        super(projectname);
         addClasspathItem("build/nobuto.jar");
     }
 
@@ -441,5 +451,44 @@ public class JavaBuilder extends Builder
         return jarFile;
     }
     
+    public List<Dependency> readElipseDependencies() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException
+    {
+        List<Dependency> deps = new ArrayList<>();
+        Document doc = W3CDomUtils.read(".classpath");
+        List<Node> entries = W3CDomUtils.selectNodes(doc, "classpath/classpathentry");
+        for(int i=0;i<entries.size();i++)
+        {
+            Element el = (Element) entries.get(i);
+            String kind = el.getAttribute("kind");
+            String path = el.getAttribute("path");
+            String combineaccessrule = el.getAttribute("combineaccessrule");
+            Dependency dep = createDependency(kind, path, combineaccessrule);
+            if(dep != null)
+            {
+                deps.add(dep);
+            }
+            else
+            {
+                verbosePrint(1, "No Dependency Handling for kind=" + kind + "; path=" + path);
+            }
+        }
+        return deps;
+    }
+    
+    protected Dependency createDependency(String kind, String path, String combineaccessrule)
+    {
+        if("lib".equals(kind))
+        {
+            return new JavaDependency(getProjectname(), null, path);
+        }
+        else if("src".equals(kind))
+        {
+            return new JavaDependency(getProjectname(), null, path);
+        }
+        else
+        {
+            return null;
+        }
+    }
 }
 

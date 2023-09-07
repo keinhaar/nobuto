@@ -16,7 +16,6 @@ import de.exware.nobuto.utils.Utilities;
 
 abstract public class AbstractPluginBuild extends JavaBuilder
 {
-    protected String projectname;
     private Maven maven = new Maven();
     private String distributionDir = "dist";
     private String classesDir = "out";
@@ -26,12 +25,12 @@ abstract public class AbstractPluginBuild extends JavaBuilder
 
     public AbstractPluginBuild(String projectname)
     {
-        this.projectname = projectname;
+        super(projectname);
     }
     
     public AbstractPluginBuild(String projectname, String eclipseURL)
     {
-        this.projectname = projectname;
+        super(projectname);
         this.eclipseURL = eclipseURL;
     }
     
@@ -245,11 +244,6 @@ abstract public class AbstractPluginBuild extends JavaBuilder
     public void setUpdateSite(String updateSite)
     {
         this.updateSite = updateSite;
-    }
-
-    public String getProjectname()
-    {
-        return projectname;
     }
 
     public Maven getMaven()
