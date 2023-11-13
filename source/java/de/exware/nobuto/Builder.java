@@ -174,6 +174,18 @@ abstract public class Builder
     }
     
     /**
+     * Displays a message to the user, and reads input from user.
+     * If in Headless mode, then it will be read from the commandline. Otherwise an InputDialog will be shown.
+     * @param echoText
+     * @return
+     * @throws IOException
+     */
+    public String readInput(String echoText, String defaultText) throws IOException
+    {
+        return Utilities.readInput(echoText, defaultText);
+    }
+    
+    /**
      * Replaces a pattern in a File. The File is not allowed to be larger then 1.000.000 bytes.
      * @param file the file, where the replacement is made.
      * @param charset the characterSet used to read and write the file.

@@ -328,6 +328,7 @@ public class Utilities
         {
             pb.inheritIO();
         }
+        verbosePrint(1, "Running command: " + pb.command());
         Process p = pb.start();
         readOutput(p, null, null);
         return p.waitFor();
@@ -374,6 +375,17 @@ public class Utilities
      */
     public static String readInput(String echoText) throws IOException
     {
+        return readInput(echoText, null);
+    }
+    
+    /**
+     * Reads the Input from Commandline, if in Headless mode. Otherwise a Dialog will pop up.
+     * @param echoText
+     * @return
+     * @throws IOException
+     */
+    public static String readInput(String echoText, String defaultText) throws IOException
+    {
         String in;
         if(GraphicsEnvironment.isHeadless())
         {
@@ -390,7 +402,7 @@ public class Utilities
         }
         else
         {
-            in = JOptionPane.showInputDialog(echoText);
+            in = JOptionPane.showInputDialog(echoText, defaultText);
         }
         return in;
     }
