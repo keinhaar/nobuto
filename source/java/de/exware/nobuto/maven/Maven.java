@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
+import de.exware.nobuto.Main;
 import de.exware.nobuto.utils.Utilities;
 import de.exware.nobuto.utils.W3CDomUtils;
 
@@ -59,6 +60,7 @@ public class Maven
                 String repo = repositories.get(i);
                 groupId = groupId.replace('.', '/');
                 URL url = new URL(repo + groupId + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + ".jar");
+                verbosePrint(2, "Searching in maven repo: " + url);
                 try
                 {
                     BufferedInputStream in = new BufferedInputStream(url.openStream());
@@ -71,6 +73,11 @@ public class Maven
                 }
                 catch(IOException ex)
                 {
+                    verbosePrint(2, "Not found: " + ex.getMessage());
+                    if(Main.verboseLevel > 3)
+                    {
+                        ex.printStackTrace();
+                    }
                     if(i+1 == repositories.size())
                     {
                         throw ex;
@@ -133,7 +140,7 @@ public class Maven
         }
         catch (Exception e)
         {
-            repo = System.getProperty("user.home") + "/.m2";
+            repo = System.getProperty("user.home") + "/.m2/repository";
         }
         return repo;
     }

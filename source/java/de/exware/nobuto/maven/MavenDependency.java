@@ -1,5 +1,7 @@
 package de.exware.nobuto.maven;
 
+import static de.exware.nobuto.utils.Utilities.verbosePrint;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -19,7 +21,6 @@ public class MavenDependency extends JavaDependency
     @Override
     public void addToClasspath(JavaBuilder builder) throws Exception
     {
-        super.addToClasspath(builder);
         Maven maven = Maven.getDefaultinstance();
         File file = new File("tmp/maven");
         file.mkdirs();
@@ -29,5 +30,6 @@ public class MavenDependency extends JavaDependency
             throw new IOException("Library " + getProjectname() + " not found");
         }
         builder.addClasspathItem(lib.getPath());
+        verbosePrint(1, "Added Classpath Item " + lib.getPath() + " in version " + getVersion());
     }
 }

@@ -490,5 +490,25 @@ public class JavaBuilder extends Builder
             return null;
         }
     }
+
+    public String getTargetVersion()
+    {
+        return targetVersion;
+    }
+
+    public void setTargetVersion(String targetVersion)
+    {
+        this.targetVersion = targetVersion;
+    }
+
+    public String getSourceVersion()
+    {
+        return sourceVersion;
+    }
+
+    public void setSourceVersion(String sourceVersion)
+    {
+        this.sourceVersion = sourceVersion;
+    }
 }
 

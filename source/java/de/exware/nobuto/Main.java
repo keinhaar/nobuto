@@ -44,9 +44,12 @@ public class Main
         }
         String clazzname = getArgument(args, "-c");
         String buildSourceDir = getArgument(args, "-d");
-        if(clazzname == null)
+        if(buildSourceDir == null)
         {
             buildSourceDir = "build";
+        }
+        if(clazzname == null)
+        {
             File sf = new File(buildSourceDir , "Build.java");
             if(sf.exists())
             {
